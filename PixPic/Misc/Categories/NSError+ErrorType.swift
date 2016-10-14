@@ -8,38 +8,38 @@
 
 extension NSError {
 
-    static func authenticationError(type: AuthenticationError) -> NSError {
+    static func authenticationError(_ type: AuthenticationError) -> NSError {
         switch type {
-        case .FacebookError:
+        case .facebookError:
             let error = NSError(
-                domain: NSBundle.mainBundle().bundleIdentifier!,
+                domain: Bundle.main.bundleIdentifier!,
                 code: 701,
                 userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Facebook error", comment: "")]
             )
 
             return error
 
-        case .ParseError:
+        case .parseError:
             let error = NSError(
-                domain: NSBundle.mainBundle().bundleIdentifier!,
+                domain: Bundle.main.bundleIdentifier!,
                 code: 702,
                 userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Parse error", comment: "")]
             )
 
             return error
 
-        case .ParseCurrentUserNotExist:
+        case .parseCurrentUserNotExist:
             let error = NSError(
-                domain: NSBundle.mainBundle().bundleIdentifier!,
+                domain: Bundle.main.bundleIdentifier!,
                 code: 703,
                 userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Parse current user not exist", comment: "")]
             )
 
             return error
 
-        case .InvalidAccessToken:
+        case .invalidAccessToken:
             let error = NSError(
-                domain: NSBundle.mainBundle().bundleIdentifier!,
+                domain: Bundle.main.bundleIdentifier!,
                 code: 704,
                 userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Access token error", comment: "")]
             )
@@ -48,7 +48,7 @@ extension NSError {
 
         default:
             return NSError(
-                domain: NSBundle.mainBundle().bundleIdentifier!,
+                domain: Bundle.main.bundleIdentifier!,
                 code: 0,
                 userInfo: [NSLocalizedDescriptionKey: NSLocalizedString("Unsupported type", comment: "")]
             )

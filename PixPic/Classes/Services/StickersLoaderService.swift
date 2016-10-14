@@ -8,11 +8,11 @@
 
 import Foundation
 
-typealias LoadingStickersCompletion = (objects: [StickersModel]?, error: NSError?) -> Void
+typealias LoadingStickersCompletion = (_ objects: [StickersModel]?, _ error: Error?) -> Void
 
 class StickersLoaderService {
 
-    private var cachePolicy: PFCachePolicy!
+    fileprivate var cachePolicy: PFCachePolicy!
 
     //register Parse subclasses
     init() {
@@ -20,7 +20,7 @@ class StickersLoaderService {
         Sticker.initialize()
     }
 
-    func loadStickers(completion: LoadingStickersCompletion? = nil) {
+    func loadStickers(_ completion: LoadingStickersCompletion? = nil) {
         figureOutCachePolicy { [weak self] in
             guard let this = self else {
                 return
@@ -29,71 +29,71 @@ class StickersLoaderService {
             let query = StickersVersion.sortedQuery
             query.cachePolicy = this.cachePolicy
 
-            query.getFirstObjectInBackgroundWithBlock { object, error in
+            query.getFirstObjectInBackground { object, error in
                 if let error = error {
                     log.debug(error.localizedDescription)
-                    completion?(objects: nil, error: error)
+                    completion?(nil, error)
 
                     return
                 }
 
                 guard let stickersVersion = object as? StickersVersion  else {
-                    completion?(objects: nil, error: nil)
+                    completion?(nil, nil)
 
                     return
                 }
 
                 this.loadStickersGroups(stickersVersion) { objects, error in
-                    completion?(objects: objects, error: error)
+                    completion?(objects, error)
                 }
             }
         }
     }
 
-    private func loadStickersGroups(stickersVersion: StickersVersion, completion: LoadingStickersCompletion) {
+    fileprivate func loadStickersGroups(_ stickersVersion: StickersVersion, completion: @escaping LoadingStickersCompletion) {
         let groupsRelationQuery = stickersVersion.groupsRelation.query()
         groupsRelationQuery.cachePolicy = cachePolicy
-        groupsRelationQuery.findObjectsInBackgroundWithBlock { [weak self] objects, error in
+        groupsRelationQuery.findObjectsInBackground { [weak self] objects, error in
             if let error = error {
                 log.debug(error.localizedDescription)
-                completion(objects: nil, error: error)
+                completion(nil, error)
 
                 return
             }
 
             guard let objects = objects as? [StickersGroup] else {
-                completion(objects: nil, error: nil)
+                completion(nil, nil)
 
                 return
             }
 
             self?.loadAllStickers(objects) { objects, error in
-                completion(objects: objects, error: error)
+                completion(objects, error)
             }
         }
     }
 
-    private func loadAllStickers(stickersGroups: [StickersGroup], completion: LoadingStickersCompletion) {
+    fileprivate func loadAllStickers(_ stickersGroups: [StickersGroup], completion: @escaping LoadingStickersCompletion) {
         var stickersModels = [StickersModel]()
 
-        let dispatchGroup = dispatch_group_create()
+        let dispatchGroup = DispatchGroup()
 
         for group in stickersGroups {
             log.debug("\(group.label)")
-            dispatch_group_enter(dispatchGroup)
+            dispatchGroup.enter()
 
             let comletionBlock = {
                 let stickersRelationQuery = group.stickersRelation.query().addAscendingOrder("createdAt")
                 stickersRelationQuery.cachePolicy = self.cachePolicy
-                stickersRelationQuery.findObjectsInBackgroundWithBlock { objects, error in
+                stickersRelationQuery.findObjectsInBackground { objects, error in
                     if let error = error {
                         log.debug(error.localizedDescription)
-                        completion(objects: nil, error: error)
+                        completion(nil, error)
 
                         return
                     }
                     guard let stickers = objects as? [Sticker] else {
-                        completion(objects: nil, error: nil)
+                        completion(nil, nil)
 
                         return
                     }
@@ -101,7 +101,7 @@ class StickersLoaderService {
                     let model = StickersModel(stickersGroup: group, stickers: stickers)
                     stickersModels.append(model)
 
-                    dispatch_group_leave(dispatchGroup)
+                    dispatchGroup.leave()
 
                     for sticker in stickers {
                         sticker.image.getDataInBackground()
@@ -109,28 +109,28 @@ class StickersLoaderService {
                 }
             }
 
-            group.image.getDataInBackgroundWithBlock { _, _ in
+            group.image.getDataInBackground { _, _ in
                 comletionBlock()
             }
 
         }
-        dispatch_group_notify(dispatchGroup, dispatch_get_main_queue()) {
-            completion(objects: stickersModels, error: nil)
+        dispatchGroup.notify(queue: DispatchQueue.main) {
+            completion(stickersModels, nil)
         }
 
     }
 
-    private func figureOutCachePolicy(with handler: () -> Void) {
+    fileprivate func figureOutCachePolicy(with handler: @escaping () -> Void) {
         //load stickers from cache
-        cachePolicy = PFCachePolicy.CacheElseNetwork
+        cachePolicy = PFCachePolicy.cacheElseNetwork
         handler()
 
         //figure out update necessity and handle it if needed
         let remoteQuery = StickersVersion.sortedQuery
-        remoteQuery.cachePolicy = .NetworkOnly
+        remoteQuery.cachePolicy = .networkOnly
 
         let localQuery = StickersVersion.sortedQuery
-        localQuery.cachePolicy = .CacheOnly
+        localQuery.cachePolicy = .cacheOnly
 
         guard ReachabilityHelper.isReachable() else {
             handler()
@@ -138,10 +138,10 @@ class StickersLoaderService {
             return
         }
 
-        localQuery.getFirstObjectInBackgroundWithBlock { localObject, error in
+        localQuery.getFirstObjectInBackground { localObject, error in
             if let error = error {
                 log.debug(error.localizedDescription)
-                self.cachePolicy = .NetworkElseCache
+                self.cachePolicy = .networkElseCache
                 handler()
 
                 return
@@ -151,7 +151,7 @@ class StickersLoaderService {
                 return
             }
 
-            remoteQuery.getFirstObjectInBackgroundWithBlock { remoteObject, error in
+            remoteQuery.getFirstObjectInBackground { remoteObject, error in
                 if let error = error {
                     log.debug(error.localizedDescription)
                     handler()
@@ -165,7 +165,7 @@ class StickersLoaderService {
 
                 if remoteVersion.version > localVersion.version {
                     log.debug("\(remoteVersion.version) > \(localVersion.version)")
-                    self.cachePolicy = .NetworkElseCache
+                    self.cachePolicy = .networkElseCache
                     handler()
                 }
             }

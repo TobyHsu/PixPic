@@ -32,43 +32,43 @@ private let facebookAlbumsListViewControllerID = "CSFFacebookAlbumsListTableView
 
 class PhotoProvider: NSObject, UINavigationControllerDelegate {
 
-    private var controller: UIViewController!
-    private lazy var imagePickerController = UIImagePickerController()
-    var didSelectPhoto: (UIImage -> Void)?
+    fileprivate var controller: UIViewController!
+    fileprivate lazy var imagePickerController = UIImagePickerController()
+    var didSelectPhoto: ((UIImage) -> Void)?
 
     func presentPhotoOptionsDialog(in viewController: UIViewController) {
         self.controller = viewController
-        imagePickerController.editing = false
+        imagePickerController.isEditing = false
         imagePickerController.delegate = self
         let actionSheetViewController = UIAlertController(
             title: nil,
             message: nil,
-            preferredStyle: .ActionSheet
+            preferredStyle: .actionSheet
         )
         let takePhotoAction = UIAlertAction.appAlertAction(
             title: takePhotoOption,
-            style: .Default
+            style: .default
         ) { _ in
             self.takePhoto()
             PushNotificationQueue.handleNotificationQueue()
         }
         let selectFromLibraryAction = UIAlertAction.appAlertAction(
             title: selectFromLibraryOption,
-            style: .Default
+            style: .default
         ) { _ in
             self.selectFromLibrary()
             PushNotificationQueue.handleNotificationQueue()
         }
         let importFromFacebookAction = UIAlertAction.appAlertAction(
             title: importFromFabookOption,
-            style: .Default
+            style: .default
         ) { _ in
             self.presentFacebookAlbumsList()
             PushNotificationQueue.handleNotificationQueue()
         }
         let cancelAction = UIAlertAction.appAlertAction(
             title: cancelOption,
-            style: .Cancel
+            style: .cancel
         ) { _ in
             PushNotificationQueue.handleNotificationQueue()
         }
@@ -76,50 +76,50 @@ class PhotoProvider: NSObject, UINavigationControllerDelegate {
         actionSheetViewController.addAction(selectFromLibraryAction)
         actionSheetViewController.addAction(importFromFacebookAction)
         actionSheetViewController.addAction(cancelAction)
-        controller.presentViewController(actionSheetViewController, animated: true, completion: nil)
+        controller.present(actionSheetViewController, animated: true, completion: nil)
     }
 
     // MARK: - Private methods
-    private func takePhoto() {
-        let cameraExists = UIImagePickerController.availableCaptureModesForCameraDevice(.Rear) != nil
-            || UIImagePickerController.availableCaptureModesForCameraDevice(.Front) != nil
+    fileprivate func takePhoto() {
+        let cameraExists = UIImagePickerController.availableCaptureModes(for: .rear) != nil
+            || UIImagePickerController.availableCaptureModes(for: .front) != nil
         if cameraExists {
-            imagePickerController.sourceType = .Camera
+            imagePickerController.sourceType = .camera
             checkCameraAccessibility()
         } else {
             handleCameraAbsence()
         }
     }
 
-    private func callCamera() {
-        imagePickerController.cameraCaptureMode = .Photo
-        imagePickerController.modalPresentationStyle = .FullScreen
-        controller.presentViewController(imagePickerController, animated: true, completion: nil)
+    fileprivate func callCamera() {
+        imagePickerController.cameraCaptureMode = .photo
+        imagePickerController.modalPresentationStyle = .fullScreen
+        controller.present(imagePickerController, animated: true, completion: nil)
     }
 
-    private func handleCameraAbsence() {
+    fileprivate func handleCameraAbsence() {
         let alertViewController = UIAlertController(
             title: cameraAbsenceTitle,
             message: cameraAbsenceMessage,
-            preferredStyle: .Alert
+            preferredStyle: .alert
         )
         let okAction = UIAlertAction.appAlertAction(
             title: okActionTitle,
-            style:.Default,
+            style:.default,
             handler: nil
         )
         alertViewController.addAction(okAction)
-        controller.presentViewController(alertViewController, animated: true, completion: nil)
+        controller.present(alertViewController, animated: true, completion: nil)
     }
 
-    private func selectFromLibrary() {
-        imagePickerController.sourceType = .PhotoLibrary
-        controller.presentViewController(imagePickerController, animated: true, completion: nil)
+    fileprivate func selectFromLibrary() {
+        imagePickerController.sourceType = .photoLibrary
+        controller.present(imagePickerController, animated: true, completion: nil)
     }
 
-    private func presentFacebookAlbumsList() {
+    fileprivate func presentFacebookAlbumsList() {
         let board = UIStoryboard(name: facebookFlow, bundle: nil)
-        let facebookViewController = board.instantiateViewControllerWithIdentifier(facebookAlbumsListViewControllerID)
+        let facebookViewController = board.instantiateViewController(withIdentifier: facebookAlbumsListViewControllerID)
             as! CSFFacebookAlbumsListViewController
         facebookViewController.successfulCropWithImageView = { [weak self] imageView in
             if let image = imageView?.image {
@@ -128,18 +128,18 @@ class PhotoProvider: NSObject, UINavigationControllerDelegate {
         }
 
         facebookViewController.fbAlbumsNeedsToDissmiss = { [weak self] in
-            self?.controller.navigationController?.popToRootViewControllerAnimated(true)
+            self?.controller.navigationController?.popToRootViewController(animated: true)
         }
         controller.navigationController?.pushViewController(facebookViewController, animated: true)
     }
 
-    private func checkCameraAccessibility() {
-        let authorizationStatus = AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)
+    fileprivate func checkCameraAccessibility() {
+        let authorizationStatus = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
         switch authorizationStatus {
-        case .Authorized:
+        case .authorized:
             callCamera()
 
-        case .Denied:
+        case .denied:
             askForCameraAccessViaSettings()
 
         default:
@@ -147,32 +147,32 @@ class PhotoProvider: NSObject, UINavigationControllerDelegate {
         }
     }
 
-    private func askForCameraAccessViaSettings() {
+    fileprivate func askForCameraAccessViaSettings() {
         let alert = UIAlertController(
             title: importantTitle,
             message: askForCameraAccessMessage,
-            preferredStyle: UIAlertControllerStyle.Alert
+            preferredStyle: UIAlertControllerStyle.alert
         )
         let cancelAction = UIAlertAction.appAlertAction(
             title: cancelActionTitle,
-            style: .Default,
+            style: .default,
             handler: nil
         )
         let allowCameraAction = UIAlertAction.appAlertAction(
             title: allowCameraActionTitle,
-            style: .Cancel
+            style: .cancel
         ) { _ in
             UIApplication.redirectToAppSettings()
         }
         alert.addAction(cancelAction)
         alert.addAction(allowCameraAction)
-        controller.presentViewController(alert, animated: true, completion: nil)
+        controller.present(alert, animated: true, completion: nil)
     }
 
-    private func presentCameraAccessDialog() {
-        if AVCaptureDevice.devicesWithMediaType(AVMediaTypeVideo).count > 0 {
-            AVCaptureDevice.requestAccessForMediaType(AVMediaTypeVideo) { [weak self] granted in
-                dispatch_async(dispatch_get_main_queue()) {
+    fileprivate func presentCameraAccessDialog() {
+        if AVCaptureDevice.devices(withMediaType: AVMediaTypeVideo).count > 0 {
+            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo) { [weak self] granted in
+                DispatchQueue.main.async {
                     self?.checkCameraAccessibility()
                 }
             }
@@ -183,37 +183,37 @@ class PhotoProvider: NSObject, UINavigationControllerDelegate {
 
 extension PhotoProvider: UIImagePickerControllerDelegate {
 
-    func imagePickerController(picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String: AnyObject]) {
+    func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [String: Any]) {
         if let image = info[UIImagePickerControllerOriginalImage] as? UIImage {
             presentCropperFor(image)
         }
     }
 
-    func imagePickerControllerDidCancel(picker: UIImagePickerController) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
+    func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
+        controller.dismiss(animated: true, completion: nil)
     }
 
-    private func presentCropperFor(image: UIImage) {
+    fileprivate func presentCropperFor(_ image: UIImage) {
         let squareSideSize = imagePickerController.view.bounds.size.width
         let cropSquareOriginY = (imagePickerController.view.bounds.size.height - squareSideSize) / 2
         let cropSquare = CGRect(x: 0, y: cropSquareOriginY, width: squareSideSize, height: squareSideSize)
         let imageCropperViewController = VPImageCropperViewController(image: image,
                                                                       cropFrame: cropSquare,
                                                                       limitScaleRatio: maxAllowedImageScale)
-        imageCropperViewController.delegate = self
-        imagePickerController.pushViewController(imageCropperViewController, animated: true)
+        imageCropperViewController?.delegate = self
+        imagePickerController.pushViewController(imageCropperViewController!, animated: true)
     }
 
 }
 extension PhotoProvider: VPImageCropperDelegate {
 
-    func imageCropper(cropperViewController: VPImageCropperViewController!, didFinished editedImage: UIImage!) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
+    func imageCropper(_ cropperViewController: VPImageCropperViewController!, didFinished editedImage: UIImage!) {
+        controller.dismiss(animated: true, completion: nil)
         didSelectPhoto?(editedImage)
     }
 
-    func imageCropperDidCancel(cropperViewController: VPImageCropperViewController!) {
-        controller.dismissViewControllerAnimated(true, completion: nil)
+    func imageCropperDidCancel(_ cropperViewController: VPImageCropperViewController!) {
+        controller.dismiss(animated: true, completion: nil)
     }
 
 }

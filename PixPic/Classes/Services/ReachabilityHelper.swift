@@ -7,13 +7,14 @@
 //
 
 import Foundation
+import ReachabilitySwift
 
 class ReachabilityHelper {
 
-    private static let reachability = try? Reachability.reachabilityForInternetConnection()
+    fileprivate static let reachability = Reachability.init()
 
     static func isReachable() -> Bool {
-        return reachability?.isReachable() == true
+        return reachability!.isReachable == true
     }
 
 }

@@ -10,17 +10,17 @@ import Foundation
 
 class SwitchView: UIView {
 
-    private var action: (Bool -> Void)!
+    fileprivate var action: ((Bool) -> Void)!
 
-    @IBOutlet private weak var textLabel: UILabel!
-    @IBOutlet private weak var switchControl: UISwitch!
+    @IBOutlet fileprivate weak var textLabel: UILabel!
+    @IBOutlet fileprivate weak var switchControl: UISwitch!
 
-    @IBAction func switchAction(sender: UISwitch) {
-        action(sender.on)
+    @IBAction func switchAction(_ sender: UISwitch) {
+        action(sender.isOn)
     }
 
-    static func instanceFromNib(text: String, initialState: Bool = true, action: (Bool -> Void)) -> SwitchView {
-        let view = UINib(nibName: String(self), bundle: nil).instantiateWithOwner(nil, options: nil).first as! SwitchView
+    static func instanceFromNib(_ text: String, initialState: Bool = true, action: @escaping ((Bool) -> Void)) -> SwitchView {
+        let view = UINib(nibName: String(describing: self), bundle: nil).instantiate(withOwner: nil, options: nil).first as! SwitchView
         view.textLabel.text = text
         view.action = action
         view.switchControl.setOn(initialState, animated: false)

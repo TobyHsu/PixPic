@@ -10,11 +10,11 @@ import Foundation
 
 class RemoteNotificationHelper {
 
-    static func setNotificationsAvailable(enabled: Bool) {
-        let application = UIApplication.sharedApplication()
+    static func setNotificationsAvailable(_ enabled: Bool) {
+        let application = UIApplication.shared
         if enabled {
             let settings = UIUserNotificationSettings(
-                forTypes: [.Alert, .Badge, .Sound],
+                types: [.alert, .badge, .sound],
                 categories: nil
             )
             application.registerUserNotificationSettings(settings)

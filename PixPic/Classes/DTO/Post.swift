@@ -12,21 +12,21 @@ class Post: PFObject {
     @NSManaged var user: User?
     @NSManaged var comment: String?
 
-    private static var onceToken: dispatch_once_t = 0
+//    static var onceToken: dispatch_once_t = 0
 
-    static var sortedQuery: PFQuery {
+    static var sortedQuery: PFQuery<PFObject> {
         let query = PFQuery(className: Post.parseClassName())
-        query.cachePolicy = .NetworkElseCache
+        query.cachePolicy = .networkElseCache
         query.includeKey("user")
-        query.orderByDescending("updatedAt")
+        query.order(byDescending: "updatedAt")
 
         return query
     }
 
     override class func initialize() {
-        dispatch_once(&onceToken) {
+//        dispatch_once(&onceToken) {
             self.registerSubclass()
-        }
+//        }
     }
 
     convenience init(image: PFFile, user: User, comment: String?) {
@@ -49,6 +49,6 @@ extension Post: PFSubclassing {
 
 enum LikeStatus: Int {
 
-    case Liked, NotLiked, Unknown
+    case liked, notLiked, unknown
     
 }

@@ -24,7 +24,7 @@ struct Appearance: Equatable {
     }
 
     var title = ""
-    var statusBarStyle: UIStatusBarStyle = .LightContent
+    var statusBarStyle: UIStatusBarStyle = .lightContent
     var navigationBar = Bar()
 
 }

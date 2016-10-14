@@ -15,23 +15,23 @@ class BaseUITableViewController: UITableViewController {
 
         let leftButton = UIBarButtonItem(
             image: UIImage.appBackButton,
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(navigateBack)
         )
         navigationItem.leftBarButtonItem = leftButton
     }
 
-    @objc private func navigateBack() {
-        navigationController?.popViewControllerAnimated(true)
+    @objc fileprivate func navigateBack() {
+        navigationController?.popViewController(animated: true)
     }
 
-    override func viewDidAppear(animated: Bool) {
+    override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
         if let subviews = navigationController?.navigationBar.subviews {
             for view in subviews {
-                view.exclusiveTouch = true
+                view.isExclusiveTouch = true
             }
         }
     }

@@ -20,35 +20,35 @@ private let saveActionTitle = NSLocalizedString("save", comment: "")
 private let logoutActionTitle = NSLocalizedString("logout_me", comment: "")
 private let cancelActionTitle = NSLocalizedString("cancel", comment: "")
 private let okActionTitle = NSLocalizedString("ok", comment: "")
-private let textFieldAnimationDuration: NSTimeInterval = 0.3
+private let textFieldAnimationDuration: TimeInterval = 0.3
 private let nickNameTextFieldUnderlineOffset: CGFloat = 20
 
 final class EditProfileViewController: BaseUIViewController, StoryboardInitiable {
 
     static let storyboardName = Constants.Storyboard.profile
 
-    private var router: EditProfileRouterInterface!
+    fileprivate var router: EditProfileRouterInterface!
 
-    private lazy var photoProvider = PhotoProvider()
+    fileprivate lazy var photoProvider = PhotoProvider()
 
-    private var image: UIImage?
-    private var userName: String?
-    private var originalUserName: String?
+    fileprivate var image: UIImage?
+    fileprivate var userName: String?
+    fileprivate var originalUserName: String?
 
-    private var kbHeight: CGFloat = 0
-    private var kbHidden = true
-    private var someChangesMade = false
-    private var usernameChanged = false
-    private weak var locator: ServiceLocator!
+    fileprivate var kbHeight: CGFloat = 0
+    fileprivate var kbHidden = true
+    fileprivate var someChangesMade = false
+    fileprivate var usernameChanged = false
+    fileprivate weak var locator: ServiceLocator!
 
-    @IBOutlet private weak var avatarImageView: UIImageView!
-    @IBOutlet private weak var nickNameTextField: UITextField!
+    @IBOutlet fileprivate weak var avatarImageView: UIImageView!
+    @IBOutlet fileprivate weak var nickNameTextField: UITextField!
 
-    @IBOutlet private weak var bottomConstraint: NSLayoutConstraint!
-    @IBOutlet private weak var topConstraint: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var bottomConstraint: NSLayoutConstraint!
+    @IBOutlet fileprivate weak var topConstraint: NSLayoutConstraint!
     @IBOutlet weak var unlerlineWidth: NSLayoutConstraint!
 
-    @IBOutlet private weak var saveButton: UIButton!
+    @IBOutlet fileprivate weak var saveButton: UIButton!
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -62,16 +62,16 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
     }
 
     deinit {
-        NSNotificationCenter.defaultCenter().removeObserver(self)
+        NotificationCenter.default.removeObserver(self)
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         AlertManager.sharedInstance.setAlertDelegate(router)
     }
 
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
         PushNotificationQueue.handleNotificationQueue()
@@ -84,31 +84,31 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
     }
 
     // MARK: - Setup methods
-    func setLocator(locator: ServiceLocator) {
+    func setLocator(_ locator: ServiceLocator) {
         self.locator = locator
     }
 
-    func setRouter(router: EditProfileRouterInterface) {
+    func setRouter(_ router: EditProfileRouterInterface) {
         self.router = router
     }
 
     // MARK: - Private methods
-    private func subscribeOnNotifications() {
-        NSNotificationCenter.defaultCenter().addObserver(
+    fileprivate func subscribeOnNotifications() {
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillShow(_:)),
-            name: UIKeyboardWillShowNotification,
+            name: NSNotification.Name.UIKeyboardWillShow,
             object: nil
         )
-        NSNotificationCenter.defaultCenter().addObserver(
+        NotificationCenter.default.addObserver(
             self,
             selector: #selector(keyboardWillHide(_:)),
-            name: UIKeyboardWillHideNotification,
+            name: NSNotification.Name.UIKeyboardWillHide,
             object: nil
         )
     }
 
-    private func configureImagesAndText() {
+    fileprivate func configureImagesAndText() {
         let tap = UITapGestureRecognizer(target: self, action: #selector(dismissKeyboard))
         view.addGestureRecognizer(tap)
 
@@ -116,11 +116,11 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
             self?.handlePhotoSelected(selectedImage)
         }
         avatarImageView.layer.masksToBounds = true
-        saveButton.enabled = false
-        nickNameTextField.text = User.currentUser()?.username
-        userName = User.currentUser()?.username
+        saveButton.isEnabled = false
+        nickNameTextField.text = User.current()?.username
+        userName = User.current()?.username
         originalUserName = userName
-        guard let avatar = User.currentUser()?.avatar else {
+        guard let avatar = User.current()?.avatar else {
             return
         }
         avatar.getImage { [weak self] image, error in
@@ -136,51 +136,51 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
         }
     }
 
-    private func makeNavigation() {
+    fileprivate func makeNavigation() {
         let leftButton = UIBarButtonItem(
             image: UIImage.appBackButton,
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(handleBackButtonTap)
         )
         navigationItem.leftBarButtonItem = leftButton
     }
 
-    @objc private func handleBackButtonTap() {
+    @objc fileprivate func handleBackButtonTap() {
         if someChangesMade {
             let alertController = UIAlertController(
                 title: backWithChangesTitle,
-                message: backWithChangesMessage, preferredStyle: .Alert
+                message: backWithChangesMessage, preferredStyle: .alert
             )
             let noAction = UIAlertAction.appAlertAction(
                 title: okActionTitle,
-                style: .Cancel
+                style: .cancel
                 ) { [weak self] action in
                     PushNotificationQueue.handleNotificationQueue()
-                    alertController.dismissViewControllerAnimated(true, completion: nil)
-                    self?.navigationController?.popViewControllerAnimated(true)
+                    alertController.dismiss(animated: true, completion: nil)
+                    self?.navigationController?.popViewController(animated: true)
             }
             alertController.addAction(noAction)
 
             let yesAction = UIAlertAction.appAlertAction(
                 title: saveActionTitle,
-                style: .Default
+                style: .default
                 ) { [weak self] action in
                     self?.saveChangesAction()
                     PushNotificationQueue.handleNotificationQueue()
             }
             alertController.addAction(yesAction)
 
-            self.presentViewController(alertController, animated: true) {}
+            self.present(alertController, animated: true) {}
         } else {
-            navigationController?.popViewControllerAnimated(true)
+            navigationController?.popViewController(animated: true)
         }
     }
 
     @IBAction func saveChangesAction() {
-        saveButton.enabled = false
+        saveButton.isEnabled = false
         if ReachabilityHelper.isReachable() {
-            guard let userName = userName where originalUserName != userName else {
+            guard let userName = userName , originalUserName != userName else {
                 saveChanges()
 
                 return
@@ -196,9 +196,9 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
 
     }
 
-    @objc private func keyboardWillShow(notification: NSNotification) {
-        if let userInfo = notification.userInfo {
-            if let keyboardSize = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.CGRectValue() {
+    @objc fileprivate func keyboardWillShow(_ notification: Notification) {
+        if let userInfo = (notification as NSNotification).userInfo {
+            if let keyboardSize = (userInfo[UIKeyboardFrameBeginUserInfoKey] as? NSValue)?.cgRectValue {
                 if kbHeight == 0 {
                     kbHeight = keyboardSize.height
                     animateTextField(true)
@@ -208,43 +208,43 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
         }
     }
 
-    @objc private func keyboardWillHide(notification: NSNotification) {
+    @objc fileprivate func keyboardWillHide(_ notification: Notification) {
         animateTextField(false)
         kbHidden = true
         kbHeight = 0
     }
 
-    private func animateTextField(up: Bool) {
+    fileprivate func animateTextField(_ up: Bool) {
         let movement = up ? kbHeight : -kbHeight
         bottomConstraint.constant = kbHidden ? movement / 2 : 0
         topConstraint.constant = kbHidden ? -movement / 2 : 0
         view.needsUpdateConstraints()
-        UIView.animateWithDuration(
-            textFieldAnimationDuration,
+        UIView.animate(
+            withDuration: textFieldAnimationDuration,
             animations: {
                 self.view.layoutIfNeeded()
             }
         )
     }
 
-    @objc private func dismissKeyboard() {
+    @objc fileprivate func dismissKeyboard() {
         view.endEditing(true)
         kbHidden = true
     }
 
-    private func handlePhotoSelected(image: UIImage) {
+    fileprivate func handlePhotoSelected(_ image: UIImage) {
         setSelectedPhoto(image)
-        saveButton.enabled = true
+        saveButton.isEnabled = true
         someChangesMade = true
         navigationController?.popToViewController(self, animated: true)
     }
 
-    private func setSelectedPhoto(image: UIImage) {
+    fileprivate func setSelectedPhoto(_ image: UIImage) {
         avatarImageView.image = image
         self.image = image
     }
 
-    private func saveChanges() {
+    fileprivate func saveChanges() {
         someChangesMade = false
         guard let image = image else {
             return
@@ -254,10 +254,10 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
             return
         }
         view.makeToastActivity(CSToastPositionCenter)
-        view.userInteractionEnabled = false
+        view.isUserInteractionEnabled = false
         let userService: UserService = locator.getService()
         userService.uploadUserChanges(
-            User.currentUser()!,
+            User.current()!,
             avatar: file,
             nickname: userName!,
             completion: { _, error in
@@ -265,22 +265,22 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
                     log.debug(error)
                 }
                 self.view.hideToastActivity()
-                self.view.userInteractionEnabled = true
+                self.view.isUserInteractionEnabled = true
             }
         )
-        navigationController?.popToRootViewControllerAnimated(true)
+        navigationController?.popToRootViewController(animated: true)
     }
 
     // MARK: - IBActions
-    @IBAction private func avatarTapAction(sender: AnyObject) {
+    @IBAction fileprivate func avatarTapAction(_ sender: AnyObject) {
         photoProvider.presentPhotoOptionsDialog(in: self)
     }
 
-    @IBAction private func searchTextFieldValueChanged(sender: UITextField) {
+    @IBAction fileprivate func searchTextFieldValueChanged(_ sender: UITextField) {
         let afterStr = sender.text
         if userName != afterStr {
             userName = afterStr
-            saveButton.enabled = true
+            saveButton.isEnabled = true
             someChangesMade = true
         }
     }
@@ -296,7 +296,7 @@ final class EditProfileViewController: BaseUIViewController, StoryboardInitiable
 // MARK: - UITextFieldDelegate methods
 extension EditProfileViewController: UITextFieldDelegate {
 
-    func textFieldShouldReturn(textField: UITextField) -> Bool {
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
 
         return false
@@ -307,7 +307,7 @@ extension EditProfileViewController: UITextFieldDelegate {
 // MARK: - NavigationControllerAppearanceContext methods
 extension EditProfileViewController: NavigationControllerAppearanceContext {
 
-    func preferredNavigationControllerAppearance(navigationController: UINavigationController) -> Appearance? {
+    func preferredNavigationControllerAppearance(_ navigationController: UINavigationController) -> Appearance? {
         var appearance = Appearance()
         appearance.title = Constants.EditProfile.navigationTitle
         return appearance

@@ -92,7 +92,6 @@
 		7774D91F1D0EC50700E5DCE0 /* PostAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8A61D0EC50700E5DCE0 /* PostAdapter.swift */; };
 		7774D9201D0EC50700E5DCE0 /* StickersPickerAdapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8A71D0EC50700E5DCE0 /* StickersPickerAdapter.swift */; };
 		7774D9211D0EC50700E5DCE0 /* AttributesCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8A91D0EC50700E5DCE0 /* AttributesCache.swift */; };
-		7774D9221D0EC50700E5DCE0 /* Reachability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8AA1D0EC50700E5DCE0 /* Reachability.swift */; };
 		7774D9231D0EC50700E5DCE0 /* VPImageCropperViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8AD1D0EC50700E5DCE0 /* VPImageCropperViewController.m */; };
 		7774D9241D0EC50700E5DCE0 /* NSError+ErrorType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8B01D0EC50700E5DCE0 /* NSError+ErrorType.swift */; };
 		7774D9251D0EC50700E5DCE0 /* NSTimer+Block.m in Sources */ = {isa = PBXBuildFile; fileRef = 7774D8B31D0EC50700E5DCE0 /* NSTimer+Block.m */; };
@@ -225,7 +224,6 @@
 		7774D8A61D0EC50700E5DCE0 /* PostAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PostAdapter.swift; sourceTree = "<group>"; };
 		7774D8A71D0EC50700E5DCE0 /* StickersPickerAdapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StickersPickerAdapter.swift; sourceTree = "<group>"; };
 		7774D8A91D0EC50700E5DCE0 /* AttributesCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AttributesCache.swift; sourceTree = "<group>"; };
-		7774D8AA1D0EC50700E5DCE0 /* Reachability.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Reachability.swift; sourceTree = "<group>"; };
 		7774D8AC1D0EC50700E5DCE0 /* VPImageCropperViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VPImageCropperViewController.h; sourceTree = "<group>"; };
 		7774D8AD1D0EC50700E5DCE0 /* VPImageCropperViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VPImageCropperViewController.m; sourceTree = "<group>"; };
 		7774D8B01D0EC50700E5DCE0 /* NSError+ErrorType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSError+ErrorType.swift"; sourceTree = "<group>"; };
@@ -562,7 +560,6 @@
 			children = (
 				77EED8391D38FD2E00A38E04 /* CSFFacebookPhotoAccess */,
 				7774D8A91D0EC50700E5DCE0 /* AttributesCache.swift */,
-				7774D8AA1D0EC50700E5DCE0 /* Reachability.swift */,
 				7774D8AB1D0EC50700E5DCE0 /* VPImageCropper */,
 			);
 			name = External;
@@ -783,12 +780,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = FDAF46961C47E8AB008060CD /* Build configuration list for PBXNativeTarget "PixPic" */;
 			buildPhases = (
-				894358DA521C070CC1E25897 /* 📦 Check Pods Manifest.lock */,
+				894358DA521C070CC1E25897 /* [CP] Check Pods Manifest.lock */,
 				FDAF466A1C47E8AA008060CD /* Sources */,
 				FDAF466B1C47E8AA008060CD /* Frameworks */,
 				FDAF466C1C47E8AA008060CD /* Resources */,
-				5C76BAE70F2FD16C4C0851EE /* 📦 Embed Pods Frameworks */,
-				AE797737D3B201BB8060F2E9 /* 📦 Copy Pods Resources */,
+				5C76BAE70F2FD16C4C0851EE /* [CP] Embed Pods Frameworks */,
+				AE797737D3B201BB8060F2E9 /* [CP] Copy Pods Resources */,
 				D9119DC22FD9CFE4F968A7C2 /* Embed Pods Frameworks */,
 				7776232A1CEF124B00CAD469 /* ShellScript */,
 				7776232B1CEF253500CAD469 /* ShellScript */,
@@ -815,6 +812,7 @@
 					FDAF466D1C47E8AA008060CD = {
 						CreatedOnToolsVersion = 7.2;
 						DevelopmentTeam = X369K52C4V;
+						LastSwiftMigration = 0800;
 						SystemCapabilities = {
 							com.apple.BackgroundModes = {
 								enabled = 1;
@@ -882,14 +880,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		5C76BAE70F2FD16C4C0851EE /* 📦 Embed Pods Frameworks */ = {
+		5C76BAE70F2FD16C4C0851EE /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Embed Pods Frameworks";
+			name = "[CP] Embed Pods Frameworks";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -923,29 +921,29 @@
 			shellPath = /bin/sh;
 			shellScript = "if which swiftlint >/dev/null; then\nswiftlint\nelse\necho \"warning: SwiftLint not installed, download from https://github.com/realm/SwiftLint\"\nfi";
 		};
-		894358DA521C070CC1E25897 /* 📦 Check Pods Manifest.lock */ = {
+		894358DA521C070CC1E25897 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		AE797737D3B201BB8060F2E9 /* 📦 Copy Pods Resources */ = {
+		AE797737D3B201BB8060F2E9 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "📦 Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1000,7 +998,6 @@
 				7774D93C1D0EC50700E5DCE0 /* CellInterface.swift in Sources */,
 				7774D92B1D0EC50700E5DCE0 /* UIColor+BaseColor.swift in Sources */,
 				7774D9281D0EC50700E5DCE0 /* UIAlertController+ConfimAction.swift in Sources */,
-				7774D9221D0EC50700E5DCE0 /* Reachability.swift in Sources */,
 				7774D9081D0EC50700E5DCE0 /* AuthenticationService.swift in Sources */,
 				7774D9251D0EC50700E5DCE0 /* NSTimer+Block.m in Sources */,
 				7774D8D41D0EC50700E5DCE0 /* StickersGroup.swift in Sources */,
@@ -1193,6 +1190,7 @@
 				PROVISIONING_PROFILE = "14af9056-c8ec-4aa2-a389-104f032e9bdd";
 				SWIFT_OBJC_BRIDGING_HEADER = "PixPic/Resources/PixPic-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
@@ -1223,6 +1221,7 @@
 				PROVISIONING_PROFILE = "0ed09714-2f2c-4001-babb-3fafc9737564";
 				SWIFT_OBJC_BRIDGING_HEADER = "PixPic/Resources/PixPic-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 3.0;
 				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;

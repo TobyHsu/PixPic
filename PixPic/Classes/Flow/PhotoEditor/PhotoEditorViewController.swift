@@ -8,14 +8,34 @@
 
 import UIKit
 import Photos
+fileprivate func < <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l < r
+  case (nil, _?):
+    return true
+  default:
+    return false
+  }
+}
+
+fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
+  switch (lhs, rhs) {
+  case let (l?, r?):
+    return l > r
+  default:
+    return rhs < lhs
+  }
+}
+
 
 typealias PhotoEditorRouterInterface = AuthorizationRouterInterface
 
 protocol PhotoEditorDelegate: class {
 
-    func photoEditor(photoEditor: PhotoEditorViewController, didChooseSticker: UIImage)
-    func imageForPhotoEditor(photoEditor: PhotoEditorViewController, withStickers: Bool) -> UIImage
-    func removeAllStickers(photoEditor: PhotoEditorViewController)
+    func photoEditor(_ photoEditor: PhotoEditorViewController, didChooseSticker: UIImage)
+    func imageForPhotoEditor(_ photoEditor: PhotoEditorViewController, withStickers: Bool) -> UIImage
+    func removeAllStickers(_ photoEditor: PhotoEditorViewController)
 
 }
 
@@ -32,19 +52,19 @@ final class PhotoEditorViewController: UIViewController, StoryboardInitiable, Na
 
     weak var delegate: PhotoEditorDelegate?
 
-    private var model: PhotoEditorModel!
+    fileprivate var model: PhotoEditorModel!
 
-    private var router: PhotoEditorRouterInterface!
-    private weak var locator: ServiceLocator!
-    private var imageController: ImageViewController?
-    private var stickersPickerController: StickersPickerViewController? {
+    fileprivate var router: PhotoEditorRouterInterface!
+    fileprivate weak var locator: ServiceLocator!
+    fileprivate var imageController: ImageViewController?
+    fileprivate var stickersPickerController: StickersPickerViewController? {
         didSet {
             stickersPickerController?.delegate = self
         }
     }
 
-    @IBOutlet private weak var stickerPickerContainer: UIView!
-    @IBOutlet private weak var imageContainer: UIView!
+    @IBOutlet fileprivate weak var stickerPickerContainer: UIView!
+    @IBOutlet fileprivate weak var imageContainer: UIView!
 
     // MARK: - Lifecycle
     override func viewDidLoad() {
@@ -53,32 +73,32 @@ final class PhotoEditorViewController: UIViewController, StoryboardInitiable, Na
         setupNavigavionBar()
     }
 
-    override func viewWillAppear(animated: Bool) {
+    override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
 
         AlertManager.sharedInstance.setAlertDelegate(router)
     }
 
-    override func viewWillDisappear(animated: Bool) {
+    override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
 
         PushNotificationQueue.handleNotificationQueue()
     }
 
-    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         switch segue.identifier! {
         case Constants.PhotoEditor.imageViewControllerSegue:
-            imageController = segue.destinationViewController as? ImageViewController
+            imageController = segue.destination as? ImageViewController
             imageController?.model = ImageViewModel(image: model.originalImage)
             imageController?.setLocator(locator)
             delegate = imageController
 
         case Constants.PhotoEditor.stickersPickerSegue:
-            stickersPickerController = segue.destinationViewController as? StickersPickerViewController
+            stickersPickerController = segue.destination as? StickersPickerViewController
             stickersPickerController?.setLocator(locator)
 
         default:
-            super.prepareForSegue(segue, sender: sender)
+            super.prepare(for: segue, sender: sender)
         }
     }
 
@@ -90,20 +110,20 @@ final class PhotoEditorViewController: UIViewController, StoryboardInitiable, Na
         view.layoutIfNeeded()
     }
 
-    func didChooseStickerFromPicket(sticker: UIImage) {
+    func didChooseStickerFromPicket(_ sticker: UIImage) {
         delegate?.photoEditor(self, didChooseSticker: sticker)
     }
 
     // MARK: - Setup methods
-    func setLocator(locator: ServiceLocator) {
+    func setLocator(_ locator: ServiceLocator) {
         self.locator = locator
     }
 
-    func setRouter(router: PhotoEditorRouterInterface) {
+    func setRouter(_ router: PhotoEditorRouterInterface) {
         self.router = router
     }
 
-    func setModel(model: PhotoEditorModel) {
+    func setModel(_ model: PhotoEditorModel) {
         self.model = model
     }
 
@@ -112,11 +132,11 @@ final class PhotoEditorViewController: UIViewController, StoryboardInitiable, Na
 // MARK: - Private methods
 extension PhotoEditorViewController {
 
-    private func setupNavigavionBar() {
+    fileprivate func setupNavigavionBar() {
         navigationItem.hidesBackButton = true
         let newBackButton = UIBarButtonItem(
             image: UIImage.appBackButton,
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(performBackNavigation)
         )
@@ -124,14 +144,14 @@ extension PhotoEditorViewController {
 
         let savingButton = UIBarButtonItem(
             image: UIImage(named: "ic_save"),
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(saveImageToCameraRoll)
         )
 
         let removeAllStickersButton = UIBarButtonItem(
             image: UIImage(named: "ic_remove"),
-            style: .Plain,
+            style: .plain,
             target: self,
             action: #selector(removeAllStickers)
         )
@@ -141,57 +161,57 @@ extension PhotoEditorViewController {
         navigationItem.title = "Edit"
     }
 
-    private func layoutImageContainer() {
+    fileprivate func layoutImageContainer() {
         var size = imageContainer.frame.size
         size.width = view.bounds.width
         size.height = size.width
         imageContainer.bounds.size = size
     }
 
-    private func layoutStickersPickerContainer() {
+    fileprivate func layoutStickersPickerContainer() {
         var size = stickerPickerContainer.frame.size
         size.width = view.bounds.width
         stickerPickerContainer.bounds.size = size
     }
 
-    @objc private func performBackNavigation() {
+    @objc fileprivate func performBackNavigation() {
         let alertController = UIAlertController(
             title: "Result wasn't saved",
             message: "Do you want to save result to the photo library?",
-            preferredStyle: .ActionSheet
+            preferredStyle: .actionSheet
         )
 
         let saveAction = UIAlertAction.appAlertAction(
             title: saveActionTitle,
-            style: .Default, color: UIColor.redColor()
+            style: .default, color: UIColor.red
         ) { [weak self] _ in
             guard let this = self else {
                 return
             }
             this.saveImageToCameraRoll()
-            this.navigationController!.popViewControllerAnimated(true)
+            this.navigationController!.popViewController(animated: true)
         }
 
         alertController.addAction(saveAction)
 
         let dontSaveAction = UIAlertAction.appAlertAction(
             title: dontSaveActionTitle,
-            style: .Default
+            style: .default
         ) { [weak self] _ in
-            self?.navigationController!.popViewControllerAnimated(true)
+            self?.navigationController!.popViewController(animated: true)
         }
         alertController.addAction(dontSaveAction)
 
         let cancelAction = UIAlertAction.appAlertAction(
             title: cancelActionTitle,
-            style: .Cancel,
+            style: .cancel,
             handler: nil)
         alertController.addAction(cancelAction)
 
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
 
-    @objc private func saveImageToCameraRoll() {
+    @objc fileprivate func saveImageToCameraRoll() {
         guard let image = delegate?.imageForPhotoEditor(self, withStickers: true) else {
             ExceptionHandler.handle(Exception.CantApplyStickers)
 
@@ -199,9 +219,9 @@ extension PhotoEditorViewController {
         }
 
         PHPhotoLibrary.requestAuthorization { status in
-            dispatch_async(dispatch_get_main_queue()) {
+            DispatchQueue.main.async {
                 switch status {
-                case .Authorized:
+                case .authorized:
                     UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil)
                     AlertManager.sharedInstance.showSimpleAlert("Image was saved to the photo library")
 
@@ -212,14 +232,14 @@ extension PhotoEditorViewController {
         }
     }
 
-    private func postToFeed() {
+    fileprivate func postToFeed() {
         do {
             guard let image = delegate?.imageForPhotoEditor(self, withStickers: true) else {
                 throw Exception.CantApplyStickers
             }
             var imageData = UIImageJPEGRepresentation(image, 1.0)
             var i = 1.0
-            while imageData?.length > Constants.FileSize.maxUploadSizeBytes {
+            while imageData?.count > Constants.FileSize.maxUploadSizeBytes {
                 i = i - 0.1
                 imageData = UIImageJPEGRepresentation(image, CGFloat(i))
             }
@@ -228,22 +248,22 @@ extension PhotoEditorViewController {
             }
             let postService: PostService = locator.getService()
             postService.savePost(file)
-            navigationController!.popToRootViewControllerAnimated(true)
+            navigationController!.popToRootViewController(animated: true)
         } catch let exception {
             ExceptionHandler.handle(exception as! Exception)
         }
     }
 
-    private func suggestSaveToCameraRoll() {
+    fileprivate func suggestSaveToCameraRoll() {
         let alertController = UIAlertController(
             title: Exception.NoConnection.rawValue,
             message: suggestSaveToCameraRollMessage,
-            preferredStyle: .ActionSheet
+            preferredStyle: .actionSheet
         )
 
         let saveAction = UIAlertAction.appAlertAction(
             title: saveActionTitle,
-            style: .Default
+            style: .default
         ) { [weak self] _ in
             self?.saveImageToCameraRoll()
         }
@@ -251,7 +271,7 @@ extension PhotoEditorViewController {
 
         let postAction = UIAlertAction.appAlertAction(
             title: postActionTitle,
-            style: .Default
+            style: .default
         ) { [weak self] _ in
             self?.postToFeed()
         }
@@ -259,14 +279,14 @@ extension PhotoEditorViewController {
 
         let cancelAction = UIAlertAction.appAlertAction(
             title: cancelActionTitle,
-            style: .Cancel,
+            style: .cancel,
             handler: nil)
         alertController.addAction(cancelAction)
 
-        presentViewController(alertController, animated: true, completion: nil)
+        present(alertController, animated: true, completion: nil)
     }
 
-    @objc private func removeAllStickers() {
+    @objc fileprivate func removeAllStickers() {
         delegate?.removeAllStickers(self)
     }
 
@@ -275,7 +295,7 @@ extension PhotoEditorViewController {
 // MARK: - IBActions
 extension PhotoEditorViewController {
 
-    @IBAction private func postEditedImage() {
+    @IBAction fileprivate func postEditedImage() {
         guard ReachabilityHelper.isReachable() else {
             suggestSaveToCameraRoll()
 

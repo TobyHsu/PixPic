@@ -23,12 +23,12 @@ class Activity: PFObject {
     @NSManaged var toPost: Post
     @NSManaged var content: PFFile
 
-    private static var onceToken: dispatch_once_t = 0
+//    fileprivate static var onceToken: dispatch_once_t = 0
 
     override class func initialize() {
-        dispatch_once(&onceToken) {
+//        dispatch_once(&onceToken) {
             self.registerSubclass()
-        }
+//        }
     }
 
 }

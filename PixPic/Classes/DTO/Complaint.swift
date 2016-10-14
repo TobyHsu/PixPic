@@ -10,16 +10,19 @@ import UIKit
 
 class Complaint: PFObject {
 
+    private static var __once: () = {
+        registerSubclass()
+//            self.registerSubclass()
+        }()
+
     @NSManaged var complainer: User
     @NSManaged var complaintReason: String
     @NSManaged var suspectedUser: User
     @NSManaged var suspectedPost: Post?
-    private static var onceToken: dispatch_once_t = 0
+    fileprivate static var onceToken: Int = 0
 
     override class func initialize() {
-        dispatch_once(&onceToken) {
-            self.registerSubclass()
-        }
+        _ = Complaint.__once
     }
 
     convenience init(user: User, post: Post? = nil, reason: ComplaintReason) {
@@ -28,7 +31,7 @@ class Complaint: PFObject {
         if let post = post {
             suspectedPost = post
         }
-        guard let complainer = User.currentUser() else {
+        guard let complainer = User.current() else {
             log.debug("Nil current user")
 
             return
@@ -38,10 +41,10 @@ class Complaint: PFObject {
         self.suspectedUser = user
     }
 
-    func postQuery() -> PFQuery {
+    func postQuery() -> PFQuery<PFObject> {
         let query = PFQuery(className: Complaint.parseClassName())
-        query.cachePolicy = .NetworkElseCache
-        query.orderByDescending("updatedAt")
+        query.cachePolicy = .networkElseCache
+        query.order(byDescending: "updatedAt")
         query.whereKey("complainer", equalTo: complainer)
         // query is called only when suspectedPost != nil
         query.whereKey("suspectedPost", equalTo: suspectedPost!)

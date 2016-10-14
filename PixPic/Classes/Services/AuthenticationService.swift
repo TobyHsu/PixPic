@@ -12,23 +12,23 @@ import ParseFacebookUtilsV4
 
 enum AuthenticationError: Int {
     
-    case FacebookError = 701
-    case ParseError = 702
-    case ParseCurrentUserNotExist = 703
-    case InvalidAccessToken = 704
+    case facebookError = 701
+    case parseError = 702
+    case parseCurrentUserNotExist = 703
+    case invalidAccessToken = 704
     
 }
 
 class AuthenticationService {
 
-    func signInWithPermission(completion: (User!, NSError?) -> Void) {
-        guard let token = FBSDKAccessToken.currentAccessToken() else {
-            let accessTokenError = NSError.authenticationError(.InvalidAccessToken)
+    func signInWithPermission(_ completion: @escaping (User?, Error?) -> Void) {
+        guard let token = FBSDKAccessToken.current() else {
+            let accessTokenError = NSError.authenticationError(.invalidAccessToken)
             completion(nil, accessTokenError)
 
             return
         }
-        PFFacebookUtils.logInInBackgroundWithAccessToken(token) { [weak self] user, error in
+        PFFacebookUtils.logInInBackground(with: token) { [weak self] user, error in
             if let user = user as? User {
                 if user.isNew || user.facebookId == nil {
                     self?.updateUserInfoViaFacebook(user) { user, error in
@@ -40,7 +40,7 @@ class AuthenticationService {
             } else if let error = error {
                 completion(nil, error)
             } else {
-                let userError = NSError.authenticationError(.FacebookError)
+                let userError = NSError.authenticationError(.facebookError)
                 completion(nil, userError)
 
                 return
@@ -48,13 +48,13 @@ class AuthenticationService {
         }
     }
 
-    func signInWithFacebookInController(controller: UIViewController, completion: (FBSDKLoginManagerLoginResult?, NSError?) -> Void) {
+    func signInWithFacebookInController(_ controller: UIViewController, completion: @escaping (FBSDKLoginManagerLoginResult?, Error?) -> Void) {
         let loginManager = FBSDKLoginManager()
         let permissions = ["public_profile", "email", "user_photos"]
 
-        loginManager.loginBehavior = .Native
-        loginManager.logInWithReadPermissions(permissions, fromViewController: controller) { result, error in
-            if error != nil || result.isCancelled {
+        loginManager.loginBehavior = .native
+        loginManager.logIn(withReadPermissions: permissions, from: controller) { result, error in
+            if error != nil || (result?.isCancelled)! {
                 loginManager.logOut()
                 completion(nil, error)
             } else {
@@ -63,18 +63,18 @@ class AuthenticationService {
         }
     }
 
-    func updateUserInfoViaFacebook(user: User, completion: (User?, NSError?) -> Void) {
+    func updateUserInfoViaFacebook(_ user: User, completion: @escaping (User?, Error?) -> Void) {
         let parameters = ["fields": "id, name, first_name, last_name, picture.type(large), email"]
         let fbRequest = FBSDKGraphRequest(
             graphPath: "me",
             parameters: parameters
         )
-        fbRequest.startWithCompletionHandler { _, result, error in
+        fbRequest?.start { _, result, error in
             if error == nil && result != nil {
                 guard let facebookInfo = result as? [String: AnyObject],
-                    picture = facebookInfo["picture"] as? [String: AnyObject],
-                    data = picture["data"] as? [String: AnyObject],
-                    url = data["url"] as? String else {
+                    let picture = facebookInfo["picture"] as? [String: AnyObject],
+                    let data = picture["data"] as? [String: AnyObject],
+                    let url = data["url"] as? String else {
                         completion(nil, nil)
 
                         return
@@ -82,7 +82,7 @@ class AuthenticationService {
                 if let avatarURL = NSURL(string: url) {
                     let avatarFile = PFFile(
                         name: Constants.UserKey.avatar,
-                        data: NSData(contentsOfURL: avatarURL)!
+                        data: NSData(contentsOf: avatarURL as URL)! as Data
                     )
                     user.avatar = avatarFile
                 }
@@ -91,7 +91,7 @@ class AuthenticationService {
                 }
                 user.facebookId = facebookInfo["id"] as? String
                 if let firstname = facebookInfo["first_name"] as? String,
-                    lastname = facebookInfo["last_name"] as? String {
+                    let lastname = facebookInfo["last_name"] as? String {
                         user.username = "\(firstname) \(lastname)"
                 }
                 completion(user, nil)
@@ -101,12 +101,12 @@ class AuthenticationService {
         }
     }
 
-    func anonymousLogIn(completion completion: (object: User?) -> Void, failure: (error: NSError?) -> Void) {
-        PFAnonymousUtils.logInWithBlock { user, error in
+    func anonymousLogIn(completion: @escaping (_ object: User?) -> Void, failure: @escaping (_ error: Error?) -> Void) {
+        PFAnonymousUtils.logIn { user, error in
             if let error = error {
-                failure(error: error)
+                failure(error)
             } else if let user = user as? User {
-                completion(object: user)
+                completion(user)
                 PFInstallation.addPFUserToCurrentInstallation()
             }
         }

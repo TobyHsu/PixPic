@@ -21,7 +21,7 @@ class StickerEditorViewControl: UIImageView {
 
         layer.cornerRadius = frame.width / 2
         backgroundColor = UIColor.appWhiteColor()
-        userInteractionEnabled = true
+        isUserInteractionEnabled = true
     }
 
     required init?(coder aDecoder: NSCoder) {

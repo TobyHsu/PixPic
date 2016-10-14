@@ -39,7 +39,7 @@ struct Constants {
 
     struct Path {
 
-        static let documents = NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0]
+        static let documents = NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true)[0]
         static let tmp = NSTemporaryDirectory()
 
     }
@@ -71,7 +71,7 @@ struct Constants {
 
     struct Profile {
 
-        static let toastActivityDuration: NSTimeInterval = 5
+        static let toastActivityDuration: TimeInterval = 5
         static let headerHeight: CGFloat = 322
         static let avatarImageCornerRadius: CGFloat = 95.5
         static let avatarImagePlaceholderName = "profile_placeholder.png"
@@ -167,7 +167,7 @@ struct Constants {
 
     struct Network {
         
-        static let timeoutTimeInterval: NSTimeInterval = 5
+        static let timeoutTimeInterval: TimeInterval = 5
 
     }
 

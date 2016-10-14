@@ -10,17 +10,17 @@ import Foundation
 
 class TextView: UIView {
 
-    private var action: (() -> Void)!
+    fileprivate var action: (() -> Void)!
 
-    @IBOutlet private weak var button: UIButton!
+    @IBOutlet fileprivate weak var button: UIButton!
 
-    @IBAction private func buttonAction() {
+    @IBAction fileprivate func buttonAction() {
         action()
     }
 
-    static func instanceFromNib(text: String, action: (() -> Void)) -> TextView {
-        let view = UINib(nibName: String(self), bundle: nil).instantiateWithOwner(nil, options: nil).first as! TextView
-        view.button.setTitle(text, forState: .Normal)
+    static func instanceFromNib(_ text: String, action: @escaping (() -> Void)) -> TextView {
+        let view = UINib(nibName: String(describing: self), bundle: nil).instantiate(withOwner: nil, options: nil).first as! TextView
+        view.button.setTitle(text, for: .normal)
         view.action = action
 
         return view

@@ -19,9 +19,9 @@ protocol StoryboardInitiable {
 extension StoryboardInitiable {
 
     static func create() -> Self {
-        let identifier = String(Self)
+        let identifier = String(describing: self)
 
-        return UIStoryboard(name: storyboardName, bundle: nil).instantiateViewControllerWithIdentifier(identifier) as! Self
+        return UIStoryboard(name: storyboardName, bundle: nil).instantiateViewController(withIdentifier: identifier) as! Self
     }
 
 }

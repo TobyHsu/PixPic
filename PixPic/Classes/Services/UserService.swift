@@ -8,17 +8,17 @@
 
 import Foundation
 
-typealias LoadingUserCompletion = (object: User?, error: NSError?) -> Void
+typealias LoadingUserCompletion = (_ object: User?, _ error: Error?) -> Void
 
 private let messageDataSuccessfullyUpdated = NSLocalizedString("user_data_updated", comment: "")
 private let messageDataNotUpdated = NSLocalizedString("check_later", comment: "")
 
 class UserService {
 
-    func uploadUserChanges(user: User, avatar: PFFile, nickname: String, completion: (Bool?, String?) -> Void) {
+    func uploadUserChanges(_ user: User, avatar: PFFile, nickname: String, completion: @escaping (Bool?, String?) -> Void) {
         user.avatar = avatar
         user.username = nickname
-        user.saveInBackgroundWithBlock { succeeded, error in
+        user.saveInBackground { succeeded, error in
             if succeeded {
                 completion(true, nil)
                 AlertManager.sharedInstance.showSimpleAlert(messageDataSuccessfullyUpdated)
@@ -31,14 +31,14 @@ class UserService {
         }
     }
 
-    func fetchUser(userId: String, completion: (user: User!, error: NSError?) -> Void) {
+    func fetchUser(_ userId: String, completion: @escaping (_ user: User?, _ error: Error?) -> Void) {
         let query = User.sortedQuery
         query.whereKey(Constants.UserKey.id, equalTo: userId)
-        query.findObjectsInBackgroundWithBlock { objects, error in
+        query.findObjectsInBackground { objects, error in
             if let error = error {
-                completion(user: nil, error: error)
+                completion(nil, error)
             } else if let user = objects?.first as? User {
-                completion(user: user, error: nil)
+                completion(user, nil)
             }
         }
     }

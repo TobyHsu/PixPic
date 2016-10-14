@@ -15,24 +15,24 @@ class User: PFUser {
     @NSManaged var appUsername: String?
     @NSManaged var passwordSet: Bool
 
-    private static var onceToken: dispatch_once_t = 0
+//    fileprivate static var onceToken: dispatch_once_t = 0
 
-    static var sortedQuery: PFQuery {
+    static var sortedQuery: PFQuery<PFObject> {
         let query = PFQuery(className: User.parseClassName())
-        query.cachePolicy = .NetworkElseCache
-        query.orderByDescending("updatedAt")
+        query.cachePolicy = .networkElseCache
+        query.order(byDescending: "updatedAt")
 
         return query
     }
 
     override class func initialize() {
-        dispatch_once(&onceToken) {
+//        dispatch_once(&onceToken) {
             self.registerSubclass()
-        }
+//        }
     }
 
-    override class func currentUser() -> User? {
-        return PFUser.currentUser() as? User
+    override class func current() -> User? {
+        return PFUser.current() as? User
     }
 
 }
@@ -41,7 +41,7 @@ extension User {
 
     var isCurrentUser: Bool {
         get {
-            if let currentUser = User.currentUser() where currentUser.facebookId == self.facebookId {
+            if let currentUser = User.current() , currentUser.facebookId == self.facebookId {
                 return true
             }
 
@@ -51,13 +51,13 @@ extension User {
 
     static var isAbsent: Bool {
         get {
-            return User.currentUser() == nil
+            return User.current() == nil
         }
     }
 
     static var notAuthorized: Bool {
         get {
-            return PFAnonymousUtils.isLinkedWithUser(User.currentUser()) || User.isAbsent
+            return PFAnonymousUtils.isLinked(with: User.current()) || User.isAbsent
         }
     }
 

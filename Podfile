@@ -10,26 +10,27 @@ target 'PixPic' do
         pod 'Crashlytics'
 
     # Social networks
-        pod 'FBSDKCoreKit', '4.10.1'
-        pod 'FBSDKLoginKit', '4.10.1'
-        pod 'FBSDKShareKit', '4.10.1'
+        pod 'FBSDKCoreKit'
+        pod 'FBSDKLoginKit'
+        pod 'FBSDKShareKit'
 
     # UI
-        pod 'Toast', '~> 3.0'
+        pod 'Toast'
         pod 'SVPullToRefresh'
-        pod 'DateTools', '~> 1.7.0'
-        pod 'DZNEmptyDataSet', '~> 1.7'
-        pod 'MBProgressHUD', '~> 0.9.2'
-        pod 'AFDropdownNotification', '~> 1.0'
+        pod 'DateTools'
+        pod 'DZNEmptyDataSet'
+        pod 'MBProgressHUD'
+        pod 'AFDropdownNotification'
 
     # Parse
-        pod 'Parse', '~> 1.12'
-        pod 'ParseFacebookUtilsV4', '~> 1.11'
+        pod 'Parse'
+        pod 'ParseFacebookUtilsV4'
 
     # Utils
-        pod 'Kingfisher', '~> 2.0'
-        pod 'XCGLogger', '~> 3.2'
-        pod 'SDWebImage', '~>3.8'
-        pod 'AFNetworking', '~> 3.0'
+        pod 'Kingfisher'
+        pod 'XCGLogger'
+        pod 'SDWebImage'
+        pod 'AFNetworking'
+        pod 'ReachabilitySwift'
 
 end

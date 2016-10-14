@@ -10,7 +10,7 @@
 extension UIApplication {
 
     static func redirectToAppSettings() {
-        UIApplication.sharedApplication().openURL(NSURL(string: UIApplicationOpenSettingsURLString)!)
+        UIApplication.shared.openURL(URL(string: UIApplicationOpenSettingsURLString)!)
     }
 
 }
